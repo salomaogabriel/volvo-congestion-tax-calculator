@@ -5,6 +5,16 @@ namespace congestion.calculator
 {
     public class CongestionTaxCalculator
     {
+        private readonly Rule _rule;
+        public CongestionTaxCalculator()
+        {
+            _rule = RuleFactory.GetRuleFromFile("gothenburg");
+        }
+        public CongestionTaxCalculator(string cityName)
+        {
+            _rule = RuleFactory.GetRuleFromFile("gothenburg");
+
+        }
         /**
              * Calculate the total toll fee for one day
              *
@@ -31,7 +41,7 @@ namespace congestion.calculator
 
                 long diffInTicks = Math.Abs(date.Ticks - intervalStart.Ticks);
                 double minutes = TimeSpan.FromTicks(diffInTicks).TotalMinutes;
-                if (minutes <= 60)
+                if (minutes <= 60 && _rule.hasSingleChargeRule)
                 {
                     if (currentDayFee > 0) currentDayFee -= tempFee;
                     if (nextFee >= tempFee) tempFee = nextFee;
@@ -67,16 +77,33 @@ namespace congestion.calculator
             int hour = date.Hour;
             int minute = date.Minute;
 
-            if (hour == 6 && minute <= 29) return 8;
-            else if (hour == 6) return 13;
-            else if (hour == 7) return 18;
-            else if (hour == 8 && minute <= 29) return 13;
-            else if (hour >= 8 && hour <= 14) return 8;
-            else if (hour == 15 && minute <= 29) return 13;
-            else if (hour == 15 || hour == 16) return 18;
-            else if (hour == 17) return 13;
-            else if (hour == 18 && minute <= 29) return 8;
-            else return 0;
+            foreach (var element in _rule.Table)
+            {
+                if ((element.startHour <= hour && element.startMinute <= minute)
+                    && (element.endHour >= hour && element.endMinute >= minute)) return element.amount;
+                if (element.startHour < hour && element.endHour > hour) return element.amount;
+                if(element.startHour == hour && element.startMinute <= minute)
+                {
+                    if(element.endHour > hour) return element.amount;
+                    else if(element.endHour == hour && element.endMinute >= minute) return element.amount;
+                }
+                if (element.endHour == hour && element.endMinute >= minute)
+                {
+                    if (element.startHour < hour) return element.amount;
+                    else if (element.startHour == hour && element.startMinute <= minute) return element.amount;
+                }
+            }
+            return 0;
+            //if (hour == 6 && minute <= 29) return 8;
+            //else if (hour == 6) return 13;
+            //else if (hour == 7) return 18;
+            //else if (hour == 8 && minute <= 29) return 13;
+            //else if (hour >= 8 && hour <= 14) return 8;
+            //else if (hour == 15 && minute <= 29) return 13;
+            //else if (hour == 15 || hour == 16) return 18;
+            //else if (hour == 17) return 13;
+            //else if (hour == 18 && minute <= 29) return 8;
+            //else return 0;
         }
 
         private Boolean IsTollFreeDate(DateTime date)
