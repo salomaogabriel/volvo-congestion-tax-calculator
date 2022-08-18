@@ -15,15 +15,22 @@ namespace Congestion.API.Controllers
     [Route("[controller]")]
     public class CalculatorController : ControllerBase
     {
-       [HttpPost]
-       public IActionResult Calculate(CalculatorRequest request)
-       {
-        var vehicle = VehicleFactory.CreateVehicle(request.vehicleType);
-        var dateTimes = StringToDateTimeConverter.GetDateTimes(request.DateTimes);
-        var calculator = new CongestionTaxCalculator();
-        var result = calculator.GetTax(vehicle, dateTimes);
-        return Ok(result);
-       }
-       
+        [HttpPost]
+        public IActionResult Calculate(CalculatorRequest request)
+        {
+            var vehicle = VehicleFactory.CreateVehicle(request.vehicleType);
+            var dateTimes = StringToDateTimeConverter.GetDateTimes(request.DateTimes);
+            var calculator = new CongestionTaxCalculator(request.City);
+            var tax = calculator.GetTax(vehicle, dateTimes);
+            var response = new CalculatorResponse()
+            {
+                Vehicle = vehicle.GetVehicleType(),
+                City = request.City,
+                TaxAmount = tax
+            };
+
+            return Ok(response);
+        }
+
     }
 }

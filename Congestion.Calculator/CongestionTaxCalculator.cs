@@ -12,7 +12,7 @@ namespace congestion.calculator
         }
         public CongestionTaxCalculator(string cityName)
         {
-            _rule = RuleFactory.GetRuleFromFile("gothenburg");
+            _rule = RuleFactory.GetRuleFromFile(cityName);
 
         }
         /**
@@ -31,7 +31,7 @@ namespace congestion.calculator
             int currentDayFee = 0;
             foreach (DateTime date in dates)
             {
-                if(date.Date != intervalStart.Date)
+                if (date.Date != intervalStart.Date)
                 {
                     totalFee += currentDayFee > 60 ? 60 : currentDayFee;
                     currentDayFee = 0;
@@ -82,10 +82,10 @@ namespace congestion.calculator
                 if ((element.startHour <= hour && element.startMinute <= minute)
                     && (element.endHour >= hour && element.endMinute >= minute)) return element.amount;
                 if (element.startHour < hour && element.endHour > hour) return element.amount;
-                if(element.startHour == hour && element.startMinute <= minute)
+                if (element.startHour == hour && element.startMinute <= minute)
                 {
-                    if(element.endHour > hour) return element.amount;
-                    else if(element.endHour == hour && element.endMinute >= minute) return element.amount;
+                    if (element.endHour > hour) return element.amount;
+                    else if (element.endHour == hour && element.endMinute >= minute) return element.amount;
                 }
                 if (element.endHour == hour && element.endMinute >= minute)
                 {
@@ -94,16 +94,6 @@ namespace congestion.calculator
                 }
             }
             return 0;
-            //if (hour == 6 && minute <= 29) return 8;
-            //else if (hour == 6) return 13;
-            //else if (hour == 7) return 18;
-            //else if (hour == 8 && minute <= 29) return 13;
-            //else if (hour >= 8 && hour <= 14) return 8;
-            //else if (hour == 15 && minute <= 29) return 13;
-            //else if (hour == 15 || hour == 16) return 18;
-            //else if (hour == 17) return 13;
-            //else if (hour == 18 && minute <= 29) return 8;
-            //else return 0;
         }
 
         private Boolean IsTollFreeDate(DateTime date)
@@ -116,7 +106,6 @@ namespace congestion.calculator
 
             if (year == 2013)
             {
-                // Holidays
                 if (month == 1 && day == 1 ||
                     month == 3 && (day == 28 || day == 29) ||
                     month == 4 && (day == 1 || day == 30) ||

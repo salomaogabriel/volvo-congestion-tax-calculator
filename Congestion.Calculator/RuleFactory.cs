@@ -8,7 +8,7 @@ namespace congestion.calculator
 {
     public static class RuleFactory
     {
-            public static Rule GetRuleFromFile(string cityName)
+        public static Rule GetRuleFromFile(string cityName)
         {
             using (StreamReader r = new StreamReader($"{cityName.ToLower()}.json"))
             {
